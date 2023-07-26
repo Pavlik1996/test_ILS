@@ -1,5 +1,8 @@
 import { Table } from 'antd'
 import s from './TableRoute.module.scss'
+import { useEffect } from 'react'
+import { useAppDispatch } from '../../common/hooks/useAppDispatch'
+import { GetRouteType, tableApi } from './table.api'
 
 export const TableRout = () => {
 	const dataSource = [
