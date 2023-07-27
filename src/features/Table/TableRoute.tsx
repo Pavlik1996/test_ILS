@@ -1,42 +1,34 @@
 import { Table } from 'antd'
 import s from './TableRoute.module.scss'
 import { useAppDispatch } from '../../common/hooks/useAppDispatch'
-import { GetRouteType } from './table.api'
-import { mapThunks } from '../routeSlice/routeSlice.ts'
 
-type RecordType = {
-	key: string
-	place_1: number[]
-	place_2: number[]
-	place_3: number[]
-	route: string
-}
+import { routeActions, routeThunks } from '../routeSlice/routeSlice.ts'
+import { DomainRouteType, RecordType } from '../../common/types/types.ts'
 
 export const TableRout = () => {
-
 	const dispatch = useAppDispatch()
 
-	const dataSource: RecordType[] = [
+	const dataSource = [
 		{
 			key: '1',
-			route: 'Маршрут#1',
-			place_1: [59.84660399, 30.29496392],
-			place_2: [59.82934196, 30.42423701],
-			place_3: [59.83567701, 30.38064206]
+			route: 'Маршрут№1',
+			place_1: '59.84660399 30.29496392',
+			place_2: '59.82934196 30.42423701',
+			place_3: '59.83567701 30.38064206'
 		},
 		{
 			key: '2',
-			route: 'Маршрут#1',
-			place_1: [59.82934196, 30.42423701],
-			place_2: [59.82761295, 30.41705607],
-			place_3: [59.84660399, 30.29496392]
+			route: 'Маршрут№2',
+			place_1: '59.82934196 30.42423701',
+			place_2: '59.82761295 30.41705607',
+			place_3: '59.84660399 30.29496392'
 		},
 		{
 			key: '3',
-			route: 'Маршрут#1',
-			place_1: [59.83567701, 30.38064206],
-			place_2: [59.84660399, 30.29496392],
-			place_3: [59.82761295, 30.41705607]
+			route: 'Маршрут№3',
+			place_1: '59.83567701 30.38064206',
+			place_2: '59.84660399 30.29496392',
+			place_3: '59.82761295 30.41705607'
 		}
 	]
 
@@ -63,30 +55,34 @@ export const TableRout = () => {
 		}
 	]
 
-	const onClickHander = (record: RecordType) => {
-		const data: GetRouteType = {
+	const onClickHandler = (record: RecordType) => {
+		const [latStartingPoint, lngStartingPoint] = record.place_1.split(' ').map(parseFloat)
+		const [latIntermediatePoint, lngIntermediatePoint] = record.place_2.split(' ').map(parseFloat)
+		const [latEndPoint, lngEndPoint] = record.place_3.split(' ').map(parseFloat)
+
+		const data: DomainRouteType = {
 			startingPoint: {
-				lat: record.place_1[0],
-				lng: record.place_1[1]
+				lat: latStartingPoint,
+				lng: lngStartingPoint
 			},
 			intermediatePoint: {
-				lat: record.place_2[0],
-				lng: record.place_2[1]
+				lat: latIntermediatePoint,
+				lng: lngIntermediatePoint
 			},
 			endPoint: {
-				lat: record.place_3[0],
-				lng: record.place_3[1]
+				lat: latEndPoint,
+				lng: lngEndPoint
 			}
 		}
-		dispatch(mapThunks.fetchRoutes(data))
+		dispatch(routeThunks.fetchRoutes(data))
+		dispatch(routeActions.setCurrentCoordinates({ routes: data }))
 	}
-
 
 	return (
 		<Table
 			onRow={record => {
 				return {
-					onClick: e => onClickHander(record)
+					onClick: e => onClickHandler(record)
 				}
 			}}
 			columns={columns}

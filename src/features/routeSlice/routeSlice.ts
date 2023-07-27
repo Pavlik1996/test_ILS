@@ -1,27 +1,37 @@
-import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
-import { GetRouteType, tableApi } from '../Table/table.api'
+import { PayloadAction, createAsyncThunk, createSlice } from '@reduxjs/toolkit'
+import { tableApi } from '../Table/table.api'
 import { LatLngExpression } from 'leaflet'
+import { DomainRouteType } from '../../common/types/types'
 
-const initialState: LatLngExpression[] = []
+const initialState = {
+	currentCoordinates: {} as DomainRouteType,
+	routes: [] as LatLngExpression[]
+}
 
 const slice = createSlice({
 	name: 'map',
 	initialState,
-	reducers: {},
+	reducers: {
+		setCurrentCoordinates: (state, action: PayloadAction<{ routes: DomainRouteType }>) => {
+			state.currentCoordinates = action.payload.routes
+		}
+	},
 	extraReducers: builder => {
-		builder.addCase(fetchRoutes.fulfilled, (_, action) => {
-			return action.payload
+		builder.addCase(fetchRoutes.fulfilled, (state, action) => {
+			state.routes = action.payload.routes
 		})
 	}
 })
 
-const fetchRoutes = createAsyncThunk<LatLngExpression[], GetRouteType>(
+const fetchRoutes = createAsyncThunk<{ routes: LatLngExpression[] }, DomainRouteType>(
 	'map/fetchRoutes',
-	async (arg) => {
+	async arg => {
 		const res = await tableApi.getRoute(arg)
-		return res.data.routes[0].geometry.coordinates
+		const routes = res.data.routes[0].geometry.coordinates
+		return { routes }
 	}
 )
 
 export const routeSlice = slice.reducer
-export const mapThunks = { fetchRoutes }
+export const routeActions = slice.actions
+export const routeThunks = { fetchRoutes }
