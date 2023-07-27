@@ -1,7 +1,7 @@
 import { LatLngExpression } from 'leaflet'
-import { MapContainer, Polyline, TileLayer } from 'react-leaflet'
+import { MapContainer, Polyline, TileLayer, Marker } from 'react-leaflet'
 import 'leaflet/dist/leaflet.css'
-import { selectRoutes } from '../routeSlice/routeSelector'
+import { selectCurrentRoutes, selectRoutes, selectShowMarker } from '../routeSlice/routeSelector'
 import { useEffect, useState } from 'react'
 import { useSelector } from 'react-redux'
 
@@ -11,13 +11,15 @@ export const MapComponent = () => {
 	const [points, setPoints] = useState<LatLngExpression[]>([])
 
 	const routes = useSelector(selectRoutes)
+	const currentRoutes = useSelector(selectCurrentRoutes)
+	const showMarker = useSelector(selectShowMarker)
 
 	useEffect(() => {
 		if (routes) {
 			// @ts-ignore
 			setPoints(routes.map(el => [el[1], el[0]]))
 		}
-	}, [routes])
+	}, [routes, centerRoute])
 
 	return (
 		<MapContainer center={centerRoute} zoom={zoom} scrollWheelZoom={true}>
@@ -26,7 +28,13 @@ export const MapComponent = () => {
 				url='https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'
 			/>
 			<Polyline color={'red'} positions={points}></Polyline>
-			{/* <Marker position={polyline_3[0]} /> */}
+			{showMarker && (
+				<>
+					<Marker position={currentRoutes.startingPoint} />
+					<Marker position={currentRoutes.intermediatePoint} />
+					<Marker position={currentRoutes.endPoint} />
+				</>
+			)}
 		</MapContainer>
 	)
 }

@@ -5,15 +5,19 @@ import { DomainRouteType } from '../../common/types/types'
 
 const initialState = {
 	currentCoordinates: {} as DomainRouteType,
-	routes: [] as LatLngExpression[]
+	routes: [] as LatLngExpression[],
+	showMarker: false as boolean
 }
 
 const slice = createSlice({
-	name: 'map',
+	name: 'route',
 	initialState,
 	reducers: {
 		setCurrentCoordinates: (state, action: PayloadAction<{ routes: DomainRouteType }>) => {
 			state.currentCoordinates = action.payload.routes
+		},
+		toggleShowMarker: (state, action: PayloadAction<{ showMarker: boolean }>) => {
+			state.showMarker = action.payload.showMarker
 		}
 	},
 	extraReducers: builder => {
@@ -24,10 +28,11 @@ const slice = createSlice({
 })
 
 const fetchRoutes = createAsyncThunk<{ routes: LatLngExpression[] }, DomainRouteType>(
-	'map/fetchRoutes',
-	async arg => {
+	'route/fetchRoutes',
+	async (arg, { dispatch }) => {
 		const res = await tableApi.getRoute(arg)
 		const routes = res.data.routes[0].geometry.coordinates
+		dispatch(routeActions.toggleShowMarker({ showMarker: true }))
 		return { routes }
 	}
 )

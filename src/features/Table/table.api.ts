@@ -8,9 +8,15 @@ const instance = axios.create({
 
 export const tableApi = {
 	getRoute(data: DomainRouteType) {
-		console.log(data)
+		const startingPointLng = data.startingPoint.lng
+		const startingPointLat = data.startingPoint.lat
+		const intermediatePointLng = data.intermediatePoint.lng
+		const intermediatePointLat = data.intermediatePoint.lat
+		const endPointLng = data.endPoint.lng
+		const endPointLat = data.endPoint.lat
+
 		return instance.get<DomainResponseType>(
-			`${data.startingPoint.lng},${data.startingPoint.lat};${data.intermediatePoint.lng},${data.intermediatePoint.lat};${data.endPoint.lng},${data.endPoint.lat}?steps=true&geometries=geojson&overview=full`
+			`${startingPointLng},${startingPointLat};${intermediatePointLng},${intermediatePointLat};${endPointLng},${endPointLat}?steps=true&geometries=geojson&overview=full`
 		)
 	}
 }
